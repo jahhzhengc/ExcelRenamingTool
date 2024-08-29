@@ -114,22 +114,62 @@ class RenamingApp(tk.Tk):
         self.entries_frame.pack(side="right",anchor="e", fill='both') 
         tk.Label(self.entries_frame, text="To change file name", borderwidth=2, relief="groove").pack(anchor="n", side="top")
 
-    def update_treeview(self): 
-        print(self.folder_path)
+    def update_treeview(self):  
+        merged_list = []
+
+        for l in self.file_names:
+            merged_list += l
+
         for idx, item in enumerate(self.tree.get_children()):
             new_file = self.entry_widgets[idx].get()
-            old_file = self.tree.item(item=item)['values'][0]
+            old_file = self.tree.item(item=item)['values'][0] 
 
+            # if its the same, ignores
             if(old_file == new_file): 
                 continue
-            else:
-                print(f"old_file: {old_file}, new_file: {new_file}")
-                new_value = new_file
-                old_file = os.path.join(self.folder_path, old_file)
-                new_file = os.path.join(self.folder_path, new_file)
-                
-                self.tree.item(item, values=(new_value))
+            
+            # gets the index of the merged list
+            index = idx + self.current_page  * self.max_per_page 
 
+            skip = False
+            # had to use new variable names
+            for idx_, item_ in enumerate(merged_list):
+                # specifically had to enumerate the merged list,
+                # cause originally the merged list would have the existing filename anyway
+                # so i had to check for every other 
+                if(idx_ == index):
+                    continue
+
+                if(item_ == new_file): 
+                    skip = True
+                    break 
+
+            new_extension = os.path.splitext(new_file)[1]
+            old_extension = os.path.splitext(old_file)[1]
+            
+            # if its empty or changed extension, revert
+            if(not new_file or new_extension != old_extension or skip):   
+                # insert literally only inserts, must delete first
+                self.entry_widgets[idx].delete(0, 'end')
+                self.entry_widgets[idx].insert(0, old_file)
+                continue
+            
+            new_value = new_file
+            old_file = os.path.join(self.folder_path, old_file)
+            new_file = os.path.join(self.folder_path, new_file)  
+
+            self.tree.item(item, values=(new_value,)) # this is meant for immediate update on the tree view
+            self.file_names[self.current_page][idx] = new_value # this is to update the original file
+            merged_list[index] = new_value # so that if there's multiple file names changed to the same name, it would be recognised as well
+            os.rename(old_file, new_file)
+
+
+"""
+    Test case 1: change name with empty string ("") 
+    Test case 3: change multiple names with same name 
+    Test case 4: change extensions for new names
+    Test case 5; change to other file's name 
+"""
 if __name__ == "__main__":
     app = RenamingApp()
     app.resizable(False,False)
