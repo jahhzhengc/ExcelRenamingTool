@@ -87,11 +87,15 @@ class RenamingApp(tk.Tk):
         select_button = tk.Button(button_frame, text="Select Folder", command=self.select_folder)
         select_button.pack(side="left", padx=5)
 
-        update_button = tk.Button(button_frame, text="Update Treeview", command=self.update_treeview)
+        update_button = tk.Button(button_frame, text="Update Files", command=self.update_treeview)
         update_button.pack(side="left", padx=5)
+
+        capitalise_all_button = tk.Button(button_frame, text= "Capitalise all", command=self.capitalise_all)
+        capitalise_all_button.pack(side="left", padx= 5)
 
         clear_all_entries_button = tk.Button(button_frame, text="Clear all", command=self.clear_all)
         clear_all_entries_button.pack(side="left", padx= 5)
+
         lowest_frame =tk.Frame(self)
         lowest_frame.pack(fill="x", side="bottom", anchor="s", pady= 20)
 
@@ -124,7 +128,15 @@ class RenamingApp(tk.Tk):
         for widgets in self.entry_widgets:
             # print(widgets)
             widgets.delete(0, 'end')
-            
+    
+    def capitalise_all(self):
+        for widgets in self.entry_widgets:
+            content = widgets.get()
+            widgets.delete(0, 'end')
+            except_extension = content.split('.')
+
+            content = except_extension[0].upper() + "." + except_extension[1]
+            widgets.insert(0, content)
     def update_treeview(self):  
         merged_list = []
 
