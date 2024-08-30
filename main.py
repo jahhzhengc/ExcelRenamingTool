@@ -50,7 +50,7 @@ class RenamingApp(tk.Tk):
         if(len(self.file_names) > 0):
             for idx, file_name in enumerate(self.file_names[self.current_page]):
                 self.tree.insert("", "end", text=str(idx+1), values=(file_name,))
-                entry = tk.Entry(self.entries_frame)
+                entry = tk.Entry(self.middle_right_frame)
                 entry.insert(0, file_name)
                 entry.pack(side= "top") 
                 self.entry_widgets.append(entry)
@@ -72,48 +72,59 @@ class RenamingApp(tk.Tk):
         self.entry_widgets = []
         self.file_names = []
         
-        button_frame = tk.Frame(self)
+        top_most_frame = tk.Frame(self)
+        top_most_frame.pack(side="top", anchor ="n", pady= 20)
+
+        button_frame = tk.Frame(top_most_frame)
         button_frame.pack(side="top", anchor ="n")
 
-        buttons_frame = tk.Frame(button_frame)
-        buttons_frame.pack(side="top", anchor ="n")
+        text_frame = tk.Frame(top_most_frame)
+        text_frame.pack(fill= "x", side="top", anchor ="n")
 
-        texts_frame = tk.Frame(button_frame)
-        texts_frame.pack(fill= "x", side="top", anchor ="n")
-
-        self.current_folder_path = tk.Label(texts_frame, text="Current folder is empty")
+        self.current_folder_path = tk.Label(text_frame, text="Current folder is empty")
         self.current_folder_path.pack()
 
-        select_button = tk.Button(buttons_frame, text="Select Folder", command=self.select_folder)
+        select_button = tk.Button(button_frame, text="Select Folder", command=self.select_folder)
         select_button.pack(side="left", padx=5)
 
-        update_button = tk.Button(buttons_frame, text="Update Treeview", command=self.update_treeview)
+        update_button = tk.Button(button_frame, text="Update Treeview", command=self.update_treeview)
         update_button.pack(side="left", padx=5)
 
-        below_frame =tk.Frame(self)
-        below_frame.pack(fill="x", side="bottom", anchor="s")
+        clear_all_entries_button = tk.Button(button_frame, text="Clear all", command=self.clear_all)
+        clear_all_entries_button.pack(side="left", padx= 5)
+        lowest_frame =tk.Frame(self)
+        lowest_frame.pack(fill="x", side="bottom", anchor="s", pady= 20)
 
-        self.next_page_btn = tk.Button(below_frame, text =">", command=self.next_page)
-        self.next_page_btn.pack(side ="right", anchor="e")
-        self.prev_page_btn = tk.Button(below_frame, text ="<",command=self.prev_page)
-        self.prev_page_btn.pack(side ="right", anchor="e")
+        self.next_page_btn = tk.Button(lowest_frame, text =">", command=self.next_page)
+        self.next_page_btn.pack(side ="right", anchor="e", padx=10)
+        self.next_page_btn["state"] = "disabled"
 
-        self.current_page_label = tk.Label(below_frame)
-        self.current_page_label.pack(side="left", anchor="w")
-        # btm frame, that holds onto tree-view on left, entries on right
-        bottom_frame = tk.Frame(self)
-        bottom_frame.pack(side="bottom", anchor="s")
+        self.prev_page_btn = tk.Button(lowest_frame, text ="<",command=self.prev_page)
+        self.prev_page_btn.pack(side ="right", anchor="e", padx= 10)
+        self.prev_page_btn["state"] = "disabled"
 
-        left_frame = tk.Frame(bottom_frame)
-        left_frame.pack(side="left", anchor="w")
+        self.current_page_label = tk.Label(lowest_frame)
+        self.current_page_label.pack(side="right", anchor="e")  
+
+        middle_frame = tk.Frame(self)
+        middle_frame.pack(side="bottom", anchor="s")
+
+        middle_left_frame = tk.Frame(middle_frame)
+        middle_left_frame.pack(side="left", anchor="w")
  
-        self.tree = ttk.Treeview(left_frame, columns=('Name',), show='headings', height=15)
+        self.tree = ttk.Treeview(middle_left_frame, columns=('Name',), show='headings', height=15)
         self.tree.heading('Name', text='File Name') 
         self.tree.pack() 
-        self.entries_frame = tk.Frame(bottom_frame)
-        self.entries_frame.pack(side="right",anchor="e", fill='both') 
-        tk.Label(self.entries_frame, text="To change file name", borderwidth=2, relief="groove").pack(anchor="n", side="top")
 
+        self.middle_right_frame = tk.Frame(middle_frame)
+        self.middle_right_frame.pack(side="right",anchor="e", fill='both') 
+        tk.Label(self.middle_right_frame, text="To change file name", borderwidth=2, relief="groove").pack(anchor="n", side="top")
+
+    def clear_all(self):
+        for widgets in self.entry_widgets:
+            # print(widgets)
+            widgets.delete(0, 'end')
+            
     def update_treeview(self):  
         merged_list = []
 
