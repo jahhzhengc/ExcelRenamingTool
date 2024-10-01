@@ -6,9 +6,12 @@ from tkinter import ttk
 class RenamingApp(tk.Tk):  
 
     def select_folder(self): 
-        self.folder_path = filedialog.askdirectory()
-
+        tmp = self.folder_path
+        self.folder_path = filedialog.askdirectory(initialdir=self.folder_path or "/")
+        
         if not self.folder_path:
+            # i reset the folder_path to tmp if the askdirectory is cancelled
+            self.folder_path = tmp 
             return  
         self.current_folder_path.config(text = self.folder_path)
         file_names = []
